@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Yakisoba PDV</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --green: #1D9E75;
+      --green-dark: #0F6E56;
+      --green-light: #E1F5EE;
+      --green-mid: #9FE1CB;
+      --bg: #ffffff;
+      --bg-secondary: #f5f5f3;
+      --text: #1a1a18;
+      --text-secondary: #6b6b67;
+      --border: rgba(0,0,0,0.12);
+      --border-hover: rgba(0,0,0,0.25);
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --danger-bg: #FCEBEB;
+      --danger-text: #A32D2D;
+      --blue-bg: #E6F1FB;
+      --blue-text: #185FA5;
+      --amber-bg: #FAEEDA;
+      --amber-text: #854F0B;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #1a1a18;
+        --bg-secondary: #252523;
+        --text: #f0ede8;
+        --text-secondary: #9a9994;
+        --border: rgba(255,255,255,0.12);
+        --border-hover: rgba(255,255,255,0.25);
+        --green-light: #0a3325;
+        --blue-bg: #0c2340;
+        --blue-text: #85B7EB;
+        --amber-bg: #2a1a05;
+        --amber-text: #FAC775;
+        --danger-bg: #2a0a0a;
+        --danger-text: #F09595;
+      }
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg-secondary);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    #app {
+      width: 100%;
+      max-width: 440px;
+      background: var(--bg);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem 1.25rem;
+      min-height: calc(100vh - 2rem);
+      align-self: flex-start;
+    }
+
+    .screen { display: none; }
+    .screen.active { display: block; }
+
+    .header {
+      text-align: center;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 0.5px solid var(--border);
+    }
+    .header h1 { font-size: 20px; font-weight: 600; color: var(--text); }
+    .header p { font-size: 13px; color: var(--text-secondary); margin-top: 4px; }
+
+    .step-indicator {
+      display: flex;
+      gap: 6px;
+      justify-content: center;
+      margin-bottom: 1.5rem;
+    }
+    .step-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--border);
+      transition: background 0.2s;
+    }
+    .step-dot.active { background: var(--green); }
+    .step-dot.done { background: var(--green-mid); }
+
+    /* Product cards */
+    .product-card {
+      background: var(--bg);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.25rem;
+      margin-bottom: 0.75rem;
+      cursor: pointer;
+      transition: border-color 0.15s, transform 0.1s;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .product-card:active { transform: scale(0.98); }
+    .product-card.selected { border: 2px solid var(--green); }
+    .product-icon {
+      width: 52px; height: 52px;
+      border-radius: 50%;
+      background: var(--green-light);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px;
+      flex-shrink: 0;
+    }
+    .product-name { font-size: 16px; font-weight: 600; color: var(--text); }
+    .product-price { font-size: 22px; font-weight: 600; color: var(--green-dark); margin-top: 2px; }
+    .product-desc { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+
+    /* Section label */
+    .section-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    /* Toggle */
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--bg);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 1rem 1.25rem;
+      margin-bottom: 0.5rem;
+    }
+    .toggle-label { font-size: 15px; color: var(--text); }
+    .toggle { position: relative; width: 44px; height: 24px; }
+    .toggle input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider {
+      position: absolute; cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: var(--border);
+      border-radius: 24px;
+      transition: 0.2s;
+    }
+    .toggle-slider:before {
+      position: absolute; content: "";
+      height: 18px; width: 18px;
+      left: 3px; bottom: 3px;
+      background: white;
+      border-radius: 50%;
+      transition: 0.2s;
+    }
+    input:checked + .toggle-slider { background: var(--green); }
+    input:checked + .toggle-slider:before { transform: translateX(20px); }
+
+    /* Choice grid */
+    .choice-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+    .choice-btn {
+      background: var(--bg);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 0.875rem;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.15s, transform 0.1s;
+    }
+    .choice-btn:active { transform: scale(0.98); }
+    .choice-btn.selected { border: 2px solid var(--green); background: var(--green-light); }
+    .choice-btn .icon { font-size: 22px; margin-bottom: 4px; }
+    .choice-btn .label { font-size: 14px; font-weight: 500; color: var(--text); }
+
+    /* Input */
+    .name-input {
+      width: 100%;
+      padding: 0.875rem 1rem;
+      font-size: 16px;
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-md);
+      background: var(--bg);
+      color: var(--text);
+      margin-bottom: 1rem;
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .name-input:focus {
+      border-color: var(--green);
+      box-shadow: 0 0 0 3px rgba(29,158,117,0.15);
+    }
+
+    /* Payment */
+    .payment-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+    .payment-btn {
+      background: var(--bg);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 1rem;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.15s, transform 0.1s;
+    }
+    .payment-btn:active { transform: scale(0.98); }
+    .payment-btn.selected { border: 2px solid var(--green); background: var(--green-light); }
+    .payment-btn .icon { font-size: 20px; margin-bottom: 4px; }
+    .payment-btn .label { font-size: 13px; font-weight: 500; color: var(--text); }
+
+    /* Buttons */
+    .primary-btn {
+      width: 100%;
+      padding: 1rem;
+      background: var(--green);
+      color: white;
+      border: none;
+      border-radius: var(--radius-md);
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+      margin-top: 0.5rem;
+    }
+    .primary-btn:active { background: var(--green-dark); transform: scale(0.98); }
+    .secondary-btn {
+      width: 100%;
+      padding: 0.875rem;
+      background: transparent;
+      color: var(--text-secondary);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-md);
+      font-size: 15px;
+      cursor: pointer;
+      transition: background 0.15s;
+      margin-top: 0.5rem;
+    }
+    .secondary-btn:active { background: var(--bg-secondary); }
+
+    /* Summary */
+    .summary-card {
+      background: var(--bg);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.25rem;
+      margin-bottom: 1rem;
+    }
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 7px 0;
+      border-bottom: 0.5px solid var(--border);
+    }
+    .summary-row:last-child { border-bottom: none; }
+    .summary-label { font-size: 14px; color: var(--text-secondary); }
+    .summary-value { font-size: 14px; font-weight: 500; color: var(--text); }
+    .summary-total { font-size: 20px; font-weight: 600; color: var(--green-dark); }
+
+    /* Cupom cozinha */
+    .cupom-cozinha {
+      background: #fff;
+      border: 1px dashed #aaa;
+      border-radius: var(--radius-md);
+      padding: 1rem;
+      margin-bottom: 1rem;
+      font-family: 'Courier New', monospace;
+      color: #222;
+      text-align: center;
+      line-height: 1.5;
+    }
+    .cupom-num { font-size: 13px; color: #666; margin-bottom: 4px; }
+    .cupom-cliente { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+    .cupom-tamanho {
+      font-size: 36px;
+      font-weight: 900;
+      letter-spacing: 3px;
+      margin: 8px 0;
+      border-top: 1px dashed #aaa;
+      border-bottom: 1px dashed #aaa;
+      padding: 8px 0;
+    }
+    .cupom-detalhe { font-size: 12px; color: #444; line-height: 2; margin-top: 6px; }
+
+    /* Success */
+    .success-icon {
+      width: 64px; height: 64px;
+      background: var(--green-light);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 28px;
+      margin: 0 auto 1rem;
+    }
+
+    /* Tags */
+    .tag {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    .tag-green { background: var(--green-light); color: var(--green-dark); }
+    .tag-blue { background: var(--blue-bg); color: var(--blue-text); }
+    .tag-gray { background: var(--bg-secondary); color: var(--text-secondary); }
+
+    /* Report */
+    .report-nav { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
+    .report-tab {
+      flex: 1;
+      padding: 0.625rem;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 500;
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      color: var(--text-secondary);
+      background: var(--bg);
+      transition: all 0.15s;
+    }
+    .report-tab.active { background: var(--green); color: white; border-color: var(--green); }
+    .metric-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 1rem; }
+    .metric-card { background: var(--bg-secondary); border-radius: var(--radius-md); padding: 0.875rem; }
+    .metric-label { font-size: 12px; color: var(--text-secondary); margin-bottom: 4px; }
+    .metric-value { font-size: 20px; font-weight: 600; color: var(--text); }
+    .metric-value.green { color: var(--green-dark); }
+
+    .order-item {
+      background: var(--bg);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 0.875rem 1rem;
+      margin-bottom: 0.5rem;
+    }
+    .order-item-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+    .order-item-name { font-size: 14px; font-weight: 500; color: var(--text); }
+    .order-item-price { font-size: 14px; font-weight: 600; color: var(--green-dark); }
+    .order-item-tags { display: flex; gap: 4px; flex-wrap: wrap; }
+
+    /* Error */
+    .error-msg {
+      font-size: 13px;
+      color: var(--danger-text);
+      background: var(--danger-bg);
+      padding: 8px 12px;
+      border-radius: var(--radius-md);
+      margin-bottom: 0.75rem;
+      display: none;
+    }
+
+    /* Print styles */
+    @media print {
+      body { background: white; padding: 0; }
+      #app { border-radius: 0; padding: 0; min-height: unset; }
+      .screen { display: none !important; }
+      #print-area { display: block !important; }
+      .cupom-cozinha {
+        border: 1px dashed #000;
+        width: 58mm;
+        margin: 0 auto;
+      }
+    }
+    #print-area { display: none; }
+  </style>
+</head>
+<body>
+<div id="app">
+
+  <!-- TELA 1: Produto -->
+  <div id="screen-produto" class="screen active">
+    <div class="header">
+      <h1>🍜 Yakisoba</h1>
+      <p>Escolha o tamanho</p>
+    </div>
+    <div class="step-indicator">
+      <div class="step-dot active"></div>
+      <div class="step-dot"></div>
+      <div class="step-dot"></div>
+      <div class="step-dot"></div>
+    </div>
+    <div class="product-card" id="card-medio" onclick="selectProduct('medio')">
+      <div class="product-icon">🍜</div>
+      <div>
+        <div class="product-name">Yakisoba Médio</div>
+        <div class="product-price">R$ 30,00</div>
+        <div class="product-desc">Porção individual</div>
+      </div>
+    </div>
+    <div class="product-card" id="card-grande" onclick="selectProduct('grande')">
+      <div class="product-icon">🍜</div>
+      <div>
+        <div class="product-name">Yakisoba Grande</div>
+        <div class="product-price">R$ 32,00</div>
+        <div class="product-desc">Porção generosa</div>
+      </div>
+    </div>
+    <div id="err-produto" class="error-msg">Selecione um tamanho para continuar.</div>
+    <button class="primary-btn" onclick="goToStep2()">Próximo →</button>
+    <button class="secondary-btn" onclick="goToRelatorio()">📊 Relatório de caixa</button>
+  </div>
+
+  <!-- TELA 2: Extras -->
+  <div id="screen-extras" class="screen">
+    <div class="header">
+      <h1>Adicionais</h1>
+      <p>Personalizar o pedido</p>
+    </div>
+    <div class="step-indicator">
+      <div class="step-dot done"></div>
+      <div class="step-dot active"></div>
+      <div class="step-dot"></div>
+      <div class="step-dot"></div>
+    </div>
+    <div class="section-label">Deseja molho e gergelim?</div>
+    <div class="toggle-row">
+      <span class="toggle-label">🥢 Molho</span>
+      <label class="toggle"><input type="checkbox" id="toggle-molho" checked><span class="toggle-slider"></span></label>
+    </div>
+    <div class="toggle-row" style="margin-bottom: 1.5rem;">
+      <span class="toggle-label">🌿 Gergelim</span>
+      <label class="toggle"><input type="checkbox" id="toggle-gergelim" checked><span class="toggle-slider"></span></label>
+    </div>
+    <div class="section-label">Talheres</div>
+    <div class="choice-grid">
+      <div class="choice-btn" id="btn-garfo" onclick="selectTalher('garfo')">
+        <div class="icon">🍴</div>
+        <div class="label">Garfo</div>
+      </div>
+      <div class="choice-btn" id="btn-hashi" onclick="selectTalher('hashi')">
+        <div class="icon">🥢</div>
+        <div class="label">Hashi</div>
+      </div>
+    </div>
+    <div id="err-talher" class="error-msg">Selecione garfo ou hashi.</div>
+    <button class="primary-btn" onclick="goToStep3()">Próximo →</button>
+    <button class="secondary-btn" onclick="goToStep(1)">← Voltar</button>
+  </div>
+
+  <!-- TELA 3: Cliente -->
+  <div id="screen-cliente" class="screen">
+    <div class="header">
+      <h1>Dados do cliente</h1>
+      <p>Nome e pagamento</p>
+    </div>
+    <div class="step-indicator">
+      <div class="step-dot done"></div>
+      <div class="step-dot done"></div>
+      <div class="step-dot active"></div>
+      <div class="step-dot"></div>
+    </div>
+    <div class="section-label" style="margin-bottom: 0.5rem;">Nome do cliente</div>
+    <input type="text" id="input-nome" class="name-input" placeholder="Digite o nome..." autocomplete="off" />
+    <div class="section-label">Forma de pagamento</div>
+    <div class="payment-grid">
+      <div class="payment-btn" id="pay-dinheiro" onclick="selectPagamento('dinheiro')">
+        <div class="icon">💵</div>
+        <div class="label">Dinheiro</div>
+      </div>
+      <div class="payment-btn" id="pay-pix" onclick="selectPagamento('pix')">
+        <div class="icon">📱</div>
+        <div class="label">Pix</div>
+      </div>
+      <div class="payment-btn" id="pay-credito" onclick="selectPagamento('credito')">
+        <div class="icon">💳</div>
+        <div class="label">Crédito</div>
+      </div>
+      <div class="payment-btn" id="pay-debito" onclick="selectPagamento('debito')">
+        <div class="icon">💳</div>
+        <div class="label">Débito</div>
+      </div>
+    </div>
+    <div id="err-cliente" class="error-msg">Preencha o nome e escolha o pagamento.</div>
+    <button class="primary-btn" onclick="goToResumo()">Revisar pedido →</button>
+    <button class="secondary-btn" onclick="goToStep(2)">← Voltar</button>
+  </div>
+
+  <!-- TELA 4: Resumo -->
+  <div id="screen-resumo" class="screen">
+    <div class="header">
+      <h1>Resumo do pedido</h1>
+      <p>Confirme antes de finalizar</p>
+    </div>
+    <div class="step-indicator">
+      <div class="step-dot done"></div>
+      <div class="step-dot done"></div>
+      <div class="step-dot done"></div>
+      <div class="step-dot active"></div>
+    </div>
+    <div class="summary-card" id="resumo-card"></div>
+    <div class="section-label" style="margin-bottom: 0.5rem;">Prévia do cupom da cozinha</div>
+    <div id="print-preview"></div>
+    <button class="primary-btn" onclick="finalizarPedido()">✅ Finalizar e imprimir</button>
+    <button class="secondary-btn" onclick="goToStep(3)">← Voltar</button>
+  </div>
+
+  <!-- TELA 5: Sucesso -->
+  <div id="screen-sucesso" class="screen">
+    <div style="text-align: center; padding: 1.5rem 0;">
+      <div class="success-icon">✅</div>
+      <h2 style="font-size: 18px; font-weight: 600; margin-bottom: 8px;">Pedido enviado!</h2>
+      <p style="font-size: 14px; color: var(--text-secondary);" id="sucesso-msg"></p>
+    </div>
+    <div id="sucesso-card"></div>
+    <button class="primary-btn" onclick="novoPedido()">+ Novo pedido</button>
+    <button class="secondary-btn" onclick="goToRelatorio()">📊 Ver relatório</button>
+  </div>
+
+  <!-- TELA 6: Relatório -->
+  <div id="screen-relatorio" class="screen">
+    <div class="header">
+      <h1>Relatório de caixa</h1>
+      <p id="relatorio-data"></p>
+    </div>
+    <div class="report-nav">
+      <div class="report-tab active" id="tab-resumo" onclick="showTab('resumo')">Resumo</div>
+      <div class="report-tab" id="tab-pedidos" onclick="showTab('pedidos')">Pedidos</div>
+    </div>
+    <div id="tab-content-resumo">
+      <div class="metric-grid">
+        <div class="metric-card"><div class="metric-label">Total geral</div><div class="metric-value green" id="rel-total"></div></div>
+        <div class="metric-card"><div class="metric-label">Pedidos</div><div class="metric-value" id="rel-qtd"></div></div>
+        <div class="metric-card"><div class="metric-label">Dinheiro</div><div class="metric-value" id="rel-dinheiro"></div></div>
+        <div class="metric-card"><div class="metric-label">Pix</div><div class="metric-value" id="rel-pix"></div></div>
+        <div class="metric-card"><div class="metric-label">Crédito</div><div class="metric-value" id="rel-credito"></div></div>
+        <div class="metric-card"><div class="metric-label">Débito</div><div class="metric-value" id="rel-debito"></div></div>
+      </div>
+      <div class="section-label" style="margin-bottom: 0.5rem;">Produtos vendidos</div>
+      <div class="metric-grid">
+        <div class="metric-card"><div class="metric-label">Médio</div><div class="metric-value" id="rel-medio"></div></div>
+        <div class="metric-card"><div class="metric-label">Grande</div><div class="metric-value" id="rel-grande"></div></div>
+      </div>
+    </div>
+    <div id="tab-content-pedidos" style="display:none;"></div>
+    <button class="secondary-btn" onclick="goToStep(1)">← Voltar ao caixa</button>
+  </div>
+
+</div>
+
+<!-- Área oculta para impressão -->
+<div id="print-area"></div>
+
+<script>
+  let pedido = {};
+  let pedidos = JSON.parse(localStorage.getItem('yaki_pedidos') || '[]');
+
+  function proximoNumero() {
+    return pedidos.length + 1;
+  }
+
+  function selectProduct(tipo) {
+    pedido.produto = tipo;
+    pedido.preco = tipo === 'medio' ? 30 : 32;
+    document.querySelectorAll('.product-card').forEach(c => c.classList.remove('selected'));
+    document.getElementById('card-' + tipo).classList.add('selected');
+    document.getElementById('err-produto').style.display = 'none';
+  }
+
+  function selectTalher(tipo) {
+    pedido.talher = tipo;
+    document.querySelectorAll('.choice-btn').forEach(c => c.classList.remove('selected'));
+    document.getElementById('btn-' + tipo).classList.add('selected');
+    document.getElementById('err-talher').style.display = 'none';
+  }
+
+  function selectPagamento(tipo) {
+    pedido.pagamento = tipo;
+    document.querySelectorAll('.payment-btn').forEach(c => c.classList.remove('selected'));
+    document.getElementById('pay-' + tipo).classList.add('selected');
+    document.getElementById('err-cliente').style.display = 'none';
+  }
+
+  function goToStep(n) {
+    const screens = ['produto', 'extras', 'cliente', 'resumo', 'sucesso', 'relatorio'];
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('screen-' + screens[n - 1]).classList.add('active');
+    window.scrollTo(0, 0);
+  }
+
+  function goToStep2() {
+    if (!pedido.produto) { document.getElementById('err-produto').style.display = 'block'; return; }
+    goToStep(2);
+  }
+
+  function goToStep3() {
+    if (!pedido.talher) { document.getElementById('err-talher').style.display = 'block'; return; }
+    pedido.molho = document.getElementById('toggle-molho').checked;
+    pedido.gergelim = document.getElementById('toggle-gergelim').checked;
+    goToStep(3);
+  }
+
+  function goToResumo() {
+    const nome = document.getElementById('input-nome').value.trim();
+    if (!nome || !pedido.pagamento) { document.getElementById('err-cliente').style.display = 'block'; return; }
+    pedido.nome = nome;
+    renderResumo();
+    goToStep(4);
+  }
+
+  function buildCupomHTML(num, p) {
+    const tamanhoLabel = p.produto === 'medio' ? 'MÉDIO' : 'GRANDE';
+    return `
+      <div class="cupom-cozinha">
+        <div class="cupom-num">Pedido #${num} &nbsp;|&nbsp; ${p.hora || ''}</div>
+        <div class="cupom-cliente">${p.nome}</div>
+        <div class="cupom-tamanho">${tamanhoLabel}</div>
+        <div class="cupom-detalhe">
+          Molho: ${p.molho ? 'SIM' : 'NÃO'} &nbsp;|&nbsp; Gergelim: ${p.gergelim ? 'SIM' : 'NÃO'}<br>
+          Talheres: ${p.talher === 'garfo' ? 'GARFO' : 'HASHI'}
+        </div>
+      </div>
+    `;
+  }
+
+  function renderResumo() {
+    const tamanhoLabel = pedido.produto === 'medio' ? 'Médio' : 'Grande';
+    const pgLabel = { dinheiro: 'Dinheiro', pix: 'Pix', credito: 'Crédito', debito: 'Débito' }[pedido.pagamento];
+    const num = proximoNumero();
+    document.getElementById('resumo-card').innerHTML = `
+      <div class="summary-row"><span class="summary-label">Nº pedido</span><span class="summary-value">#${num}</span></div>
+      <div class="summary-row"><span class="summary-label">Cliente</span><span class="summary-value">${pedido.nome}</span></div>
+      <div class="summary-row"><span class="summary-label">Tamanho</span><span class="summary-value">Yakisoba ${tamanhoLabel}</span></div>
+      <div class="summary-row"><span class="summary-label">Molho</span><span class="summary-value">${pedido.molho ? '✓ Sim' : '✗ Não'}</span></div>
+      <div class="summary-row"><span class="summary-label">Gergelim</span><span class="summary-value">${pedido.gergelim ? '✓ Sim' : '✗ Não'}</span></div>
+      <div class="summary-row"><span class="summary-label">Talheres</span><span class="summary-value">${pedido.talher === 'garfo' ? '🍴 Garfo' : '🥢 Hashi'}</span></div>
+      <div class="summary-row"><span class="summary-label">Pagamento</span><span class="summary-value">${pgLabel}</span></div>
+      <div class="summary-row"><span class="summary-label" style="font-weight:600;">Total</span><span class="summary-total">R$ ${pedido.preco.toFixed(2).replace('.', ',')}</span></div>
+    `;
+    const previewPedido = { ...pedido, hora: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) };
+    document.getElementById('print-preview').innerHTML = buildCupomHTML(num, previewPedido);
+  }
+
+  function finalizarPedido() {
+    pedido.hora = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+    pedido.data = new Date().toLocaleDateString('pt-BR');
+    const num = proximoNumero();
+    pedido.numero = num;
+    pedidos.push({ ...pedido });
+    localStorage.setItem('yaki_pedidos', JSON.stringify(pedidos));
+
+    // Impressão via window.print()
+    const printArea = document.getElementById('print-area');
+    printArea.innerHTML = buildCupomHTML(num, pedido);
+    window.print();
+
+    document.getElementById('sucesso-msg').textContent = '#' + num + ' — ' + pedido.nome + ' — R$ ' + pedido.preco.toFixed(2).replace('.', ',');
+    document.getElementById('sucesso-card').innerHTML = buildCupomHTML(num, pedido);
+    goToStep(5);
+  }
+
+  function novoPedido() {
+    pedido = {};
+    document.querySelectorAll('.product-card').forEach(c => c.classList.remove('selected'));
+    document.querySelectorAll('.choice-btn').forEach(c => c.classList.remove('selected'));
+    document.querySelectorAll('.payment-btn').forEach(c => c.classList.remove('selected'));
+    document.getElementById('input-nome').value = '';
+    document.getElementById('toggle-molho').checked = true;
+    document.getElementById('toggle-gergelim').checked = true;
+    goToStep(1);
+  }
+
+  function goToRelatorio() {
+    const hoje = new Date().toLocaleDateString('pt-BR');
+    document.getElementById('relatorio-data').textContent = 'Data: ' + hoje;
+    const totais = { dinheiro: 0, pix: 0, credito: 0, debito: 0 };
+    let totalGeral = 0, qtdMedio = 0, qtdGrande = 0;
+    pedidos.forEach(p => {
+      totalGeral += p.preco;
+      totais[p.pagamento] = (totais[p.pagamento] || 0) + p.preco;
+      if (p.produto === 'medio') qtdMedio++; else qtdGrande++;
+    });
+    const fmt = v => 'R$ ' + v.toFixed(2).replace('.', ',');
+    document.getElementById('rel-total').textContent = fmt(totalGeral);
+    document.getElementById('rel-qtd').textContent = pedidos.length;
+    document.getElementById('rel-dinheiro').textContent = fmt(totais.dinheiro || 0);
+    document.getElementById('rel-pix').textContent = fmt(totais.pix || 0);
+    document.getElementById('rel-credito').textContent = fmt(totais.credito || 0);
+    document.getElementById('rel-debito').textContent = fmt(totais.debito || 0);
+    document.getElementById('rel-medio').textContent = qtdMedio + ' un.';
+    document.getElementById('rel-grande').textContent = qtdGrande + ' un.';
+    renderPedidosList();
+    goToStep(6);
+  }
+
+  function renderPedidosList() {
+    const container = document.getElementById('tab-content-pedidos');
+    if (pedidos.length === 0) {
+      container.innerHTML = '<p style="font-size:14px;color:var(--text-secondary);text-align:center;padding:1rem;">Nenhum pedido ainda.</p>';
+      return;
+    }
+    const pgLabels = { dinheiro: 'Dinheiro', pix: 'Pix', credito: 'Crédito', debito: 'Débito' };
+    container.innerHTML = [...pedidos].reverse().map(p => `
+      <div class="order-item">
+        <div class="order-item-header">
+          <span class="order-item-name">#${p.numero} ${p.nome} <span style="font-weight:400;font-size:12px;color:var(--text-secondary)">${p.hora || ''}</span></span>
+          <span class="order-item-price">R$ ${p.preco.toFixed(2).replace('.', ',')}</span>
+        </div>
+        <div class="order-item-tags">
+          <span class="tag tag-green">${p.produto === 'medio' ? 'Médio' : 'Grande'}</span>
+          ${p.molho ? '<span class="tag tag-gray">Molho</span>' : ''}
+          ${p.gergelim ? '<span class="tag tag-gray">Gergelim</span>' : ''}
+          <span class="tag tag-gray">${p.talher === 'garfo' ? 'Garfo' : 'Hashi'}</span>
+          <span class="tag tag-blue">${pgLabels[p.pagamento]}</span>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function showTab(tab) {
+    document.getElementById('tab-content-resumo').style.display = tab === 'resumo' ? 'block' : 'none';
+    document.getElementById('tab-content-pedidos').style.display = tab === 'pedidos' ? 'block' : 'none';
+    document.querySelectorAll('.report-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('tab-' + tab).classList.add('active');
+  }
+</script>
+</body>
+</html>
