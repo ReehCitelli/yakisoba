@@ -1,168 +1,195 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+  <meta name="theme-color" content="#faf7f0"/>
   <title>Yakisoba PDV</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --green: #1D9E75;
-      --green-dark: #0F6E56;
-      --green-light: #E1F5EE;
-      --green-mid: #9FE1CB;
-      --bg: #ffffff;
-      --bg-secondary: #f5f5f3;
-      --text: #1a1a18;
-      --text-secondary: #6b6b67;
-      --border: rgba(0,0,0,0.12);
-      --border-hover: rgba(0,0,0,0.25);
-      --radius-md: 8px;
-      --radius-lg: 12px;
-      --danger-bg: #FCEBEB;
-      --danger-text: #A32D2D;
-      --blue-bg: #E6F1FB;
-      --blue-text: #185FA5;
-      --amber-bg: #FAEEDA;
-      --amber-text: #854F0B;
+      --ink: #1a1208;
+      --ink2: #5c4a2a;
+      --ink3: #9c8060;
+      --paper: #faf7f0;
+      --paper2: #f0ead8;
+      --paper3: #e8dfc8;
+      --red: #c0392b;
+      --red-light: #fdecea;
+      --red-dark: #922b21;
+      --gold: #b8860b;
+      --gold-light: #fef9e7;
+      --border: rgba(90,60,20,0.15);
+      --border2: rgba(90,60,20,0.3);
+      --radius: 10px;
+      --radius-lg: 16px;
     }
 
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --bg: #1a1a18;
-        --bg-secondary: #252523;
-        --text: #f0ede8;
-        --text-secondary: #9a9994;
-        --border: rgba(255,255,255,0.12);
-        --border-hover: rgba(255,255,255,0.25);
-        --green-light: #0a3325;
-        --blue-bg: #0c2340;
-        --blue-text: #85B7EB;
-        --amber-bg: #2a1a05;
-        --amber-text: #FAC775;
-        --danger-bg: #2a0a0a;
-        --danger-text: #F09595;
-      }
-    }
-
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background: var(--bg-secondary);
-      color: var(--text);
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      padding: 1rem;
+    html, body {
+      height: 100%;
+      font-family: 'DM Sans', sans-serif;
+      background: var(--paper2);
+      color: var(--ink);
+      -webkit-tap-highlight-color: transparent;
+      -webkit-text-size-adjust: 100%;
     }
 
     #app {
-      width: 100%;
-      max-width: 440px;
-      background: var(--bg);
-      border-radius: var(--radius-lg);
-      padding: 1.5rem 1.25rem;
-      min-height: calc(100vh - 2rem);
-      align-self: flex-start;
+      max-width: 480px;
+      margin: 0 auto;
+      min-height: 100vh;
+      background: var(--paper);
+      position: relative;
+      overflow: hidden;
     }
 
-    .screen { display: none; }
+    .screen { display: none; animation: fadeUp 0.32s cubic-bezier(.22,.68,0,1.2) both; }
     .screen.active { display: block; }
 
-    .header {
-      text-align: center;
-      margin-bottom: 1.5rem;
-      padding-bottom: 1rem;
-      border-bottom: 0.5px solid var(--border);
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
     }
-    .header h1 { font-size: 20px; font-weight: 600; color: var(--text); }
-    .header p { font-size: 13px; color: var(--text-secondary); margin-top: 4px; }
-
-    .step-indicator {
-      display: flex;
-      gap: 6px;
-      justify-content: center;
-      margin-bottom: 1.5rem;
+    @keyframes slideRight {
+      from { opacity: 0; transform: translateX(-16px); }
+      to   { opacity: 1; transform: translateX(0); }
     }
-    .step-dot {
-      width: 8px; height: 8px;
-      border-radius: 50%;
-      background: var(--border);
-      transition: background 0.2s;
-    }
-    .step-dot.active { background: var(--green); }
-    .step-dot.done { background: var(--green-mid); }
-
-    /* Product cards */
-    .product-card {
-      background: var(--bg);
-      border: 0.5px solid var(--border);
-      border-radius: var(--radius-lg);
-      padding: 1.25rem;
-      margin-bottom: 0.75rem;
-      cursor: pointer;
-      transition: border-color 0.15s, transform 0.1s;
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-    .product-card:active { transform: scale(0.98); }
-    .product-card.selected { border: 2px solid var(--green); }
-    .product-icon {
-      width: 52px; height: 52px;
-      border-radius: 50%;
-      background: var(--green-light);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 24px;
-      flex-shrink: 0;
-    }
-    .product-name { font-size: 16px; font-weight: 600; color: var(--text); }
-    .product-price { font-size: 22px; font-weight: 600; color: var(--green-dark); margin-top: 2px; }
-    .product-desc { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
-
-    /* Section label */
-    .section-label {
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--text-secondary);
-      margin-bottom: 0.75rem;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
+    @keyframes pop {
+      0%   { transform: scale(0.92); }
+      60%  { transform: scale(1.04); }
+      100% { transform: scale(1); }
     }
 
-    /* Toggle */
-    .toggle-row {
+    /* ── Topbar ── */
+    .topbar {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      background: var(--bg);
-      border: 0.5px solid var(--border);
-      border-radius: var(--radius-md);
-      padding: 1rem 1.25rem;
-      margin-bottom: 0.5rem;
+      padding: 1rem 1.25rem 0.75rem;
+      border-bottom: 1px solid var(--border);
+      background: var(--paper);
     }
-    .toggle-label { font-size: 15px; color: var(--text); }
-    .toggle { position: relative; width: 44px; height: 24px; }
-    .toggle input { opacity: 0; width: 0; height: 0; }
-    .toggle-slider {
+    .topbar-title {
+      font-family: 'Noto Serif JP', serif;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--red-dark);
+      letter-spacing: 0.02em;
+    }
+    .topbar-sub { font-size: 12px; color: var(--ink3); margin-top: 1px; }
+    .topbar-badge {
+      background: var(--paper2);
+      border: 1px solid var(--border2);
+      border-radius: 20px;
+      padding: 4px 10px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--ink2);
+    }
+
+    /* ── Progress ── */
+    .progress-bar { height: 3px; background: var(--paper3); }
+    .progress-fill {
+      height: 3px;
+      background: var(--red);
+      transition: width 0.4s cubic-bezier(.4,0,.2,1);
+    }
+
+    /* ── Body ── */
+    .body { padding: 1.25rem; }
+    .section-title {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--ink3);
+      margin-bottom: 0.875rem;
+    }
+
+    /* ── Product cards ── */
+    .prod-card {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      background: var(--paper);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1rem 1.25rem;
+      cursor: pointer;
+      margin-bottom: 0.625rem;
+      transition: border-color 0.15s, transform 0.1s, background 0.15s;
+      position: relative;
+      overflow: hidden;
+      min-height: 80px;
+    }
+    .prod-card::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 4px;
+      background: var(--border2);
+      transition: background 0.2s;
+    }
+    .prod-card.selected { border-color: var(--red); background: var(--red-light); }
+    .prod-card.selected::before { background: var(--red); }
+    .prod-card:active { transform: scale(0.97); }
+    .prod-icon {
+      width: 52px; height: 52px;
+      border-radius: 12px;
+      background: var(--paper2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px;
+      flex-shrink: 0;
+      transition: background 0.15s;
+    }
+    .prod-card.selected .prod-icon { background: #fad7d5; }
+    .prod-name { font-size: 16px; font-weight: 600; color: var(--ink); }
+    .prod-size { font-size: 12px; color: var(--ink3); margin-top: 2px; }
+    .prod-price { font-size: 22px; font-weight: 700; color: var(--red-dark); margin-left: auto; }
+
+    /* ── Toggles ── */
+    .toggle-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--paper);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem 1.125rem;
+      margin-bottom: 0.5rem;
+      transition: background 0.15s;
+      min-height: 56px;
+    }
+    .toggle-card.on { background: var(--gold-light); border-color: rgba(184,134,11,0.3); }
+    .toggle-lbl { font-size: 15px; font-weight: 500; color: var(--ink); }
+    .tog { position: relative; width: 44px; height: 25px; flex-shrink: 0; }
+    .tog input { opacity: 0; width: 0; height: 0; }
+    .tog-sl {
       position: absolute; cursor: pointer;
       top: 0; left: 0; right: 0; bottom: 0;
-      background: var(--border);
-      border-radius: 24px;
-      transition: 0.2s;
+      background: var(--paper3);
+      border-radius: 25px;
+      transition: .2s;
     }
-    .toggle-slider:before {
-      position: absolute; content: "";
-      height: 18px; width: 18px;
+    .tog-sl:before {
+      position: absolute; content: '';
+      height: 19px; width: 19px;
       left: 3px; bottom: 3px;
       background: white;
       border-radius: 50%;
-      transition: 0.2s;
+      transition: .2s;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
     }
-    input:checked + .toggle-slider { background: var(--green); }
-    input:checked + .toggle-slider:before { transform: translateX(20px); }
+    input:checked + .tog-sl { background: var(--gold); }
+    input:checked + .tog-sl:before { transform: translateX(19px); }
 
-    /* Choice grid */
+    /* ── Choice grid ── */
     .choice-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -170,215 +197,263 @@
       margin-bottom: 1rem;
     }
     .choice-btn {
-      background: var(--bg);
-      border: 0.5px solid var(--border);
-      border-radius: var(--radius-md);
-      padding: 0.875rem;
+      background: var(--paper);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.25rem 1rem;
       text-align: center;
       cursor: pointer;
-      transition: border-color 0.15s, transform 0.1s;
+      transition: all 0.15s;
+      min-height: 90px;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
     }
-    .choice-btn:active { transform: scale(0.98); }
-    .choice-btn.selected { border: 2px solid var(--green); background: var(--green-light); }
-    .choice-btn .icon { font-size: 22px; margin-bottom: 4px; }
-    .choice-btn .label { font-size: 14px; font-weight: 500; color: var(--text); }
+    .choice-btn:active { transform: scale(0.96); }
+    .choice-btn.selected { border-color: var(--red); background: var(--red-light); }
+    .choice-btn .ci { font-size: 26px; margin-bottom: 8px; }
+    .choice-btn .cl { font-size: 14px; font-weight: 600; color: var(--ink); }
 
-    /* Input */
-    .name-input {
+    /* ── Name input ── */
+    .nm-input {
       width: 100%;
-      padding: 0.875rem 1rem;
+      padding: 0.9rem 1rem;
       font-size: 16px;
-      border: 0.5px solid var(--border);
-      border-radius: var(--radius-md);
-      background: var(--bg);
-      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      border: 1.5px solid var(--border2);
+      border-radius: var(--radius);
+      background: var(--paper);
+      color: var(--ink);
       margin-bottom: 1rem;
-      outline: none;
       transition: border-color 0.15s, box-shadow 0.15s;
+      outline: none;
+      -webkit-appearance: none;
     }
-    .name-input:focus {
-      border-color: var(--green);
-      box-shadow: 0 0 0 3px rgba(29,158,117,0.15);
+    .nm-input:focus {
+      border-color: var(--red);
+      box-shadow: 0 0 0 3px rgba(192,57,43,0.12);
     }
 
-    /* Payment */
-    .payment-grid {
+    /* ── Payment grid ── */
+    .pay-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 0.5rem;
       margin-bottom: 1rem;
     }
-    .payment-btn {
-      background: var(--bg);
-      border: 0.5px solid var(--border);
-      border-radius: var(--radius-md);
+    .pay-btn {
+      background: var(--paper);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-lg);
       padding: 1rem;
       text-align: center;
       cursor: pointer;
-      transition: border-color 0.15s, transform 0.1s;
+      transition: all 0.15s;
+      min-height: 72px;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
     }
-    .payment-btn:active { transform: scale(0.98); }
-    .payment-btn.selected { border: 2px solid var(--green); background: var(--green-light); }
-    .payment-btn .icon { font-size: 20px; margin-bottom: 4px; }
-    .payment-btn .label { font-size: 13px; font-weight: 500; color: var(--text); }
+    .pay-btn:active { transform: scale(0.96); }
+    .pay-btn.selected { border-color: var(--red); background: var(--red-light); }
+    .pay-btn .pi { font-size: 22px; margin-bottom: 6px; }
+    .pay-btn .pl { font-size: 13px; font-weight: 600; color: var(--ink); }
 
-    /* Buttons */
-    .primary-btn {
+    /* ── Buttons ── */
+    .btn-primary {
       width: 100%;
       padding: 1rem;
-      background: var(--green);
-      color: white;
+      min-height: 54px;
+      background: var(--red);
+      color: #fff;
       border: none;
-      border-radius: var(--radius-md);
+      border-radius: var(--radius);
       font-size: 16px;
+      font-weight: 700;
+      font-family: 'DM Sans', sans-serif;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+      margin-top: 0.75rem;
+      letter-spacing: 0.01em;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn-primary:active { background: var(--red-dark); transform: scale(0.97); }
+
+    .btn-sec {
+      width: 100%;
+      padding: 1rem;
+      min-height: 54px;
+      background: var(--paper2);
+      color: var(--ink);
+      border: 1.5px solid var(--border2);
+      border-radius: var(--radius);
+      font-size: 15px;
       font-weight: 600;
+      font-family: 'DM Sans', sans-serif;
       cursor: pointer;
       transition: background 0.15s, transform 0.1s;
       margin-top: 0.5rem;
+      -webkit-tap-highlight-color: transparent;
     }
-    .primary-btn:active { background: var(--green-dark); transform: scale(0.98); }
-    .secondary-btn {
-      width: 100%;
-      padding: 0.875rem;
-      background: transparent;
-      color: var(--text-secondary);
-      border: 0.5px solid var(--border);
-      border-radius: var(--radius-md);
-      font-size: 15px;
-      cursor: pointer;
-      transition: background 0.15s;
-      margin-top: 0.5rem;
-    }
-    .secondary-btn:active { background: var(--bg-secondary); }
+    .btn-sec:active { background: var(--paper3); transform: scale(0.97); }
 
-    /* Summary */
-    .summary-card {
-      background: var(--bg);
-      border: 0.5px solid var(--border);
+    /* ── Error ── */
+    .err {
+      font-size: 13px;
+      color: var(--red-dark);
+      background: var(--red-light);
+      padding: 10px 12px;
+      border-radius: var(--radius);
+      margin-bottom: 0.75rem;
+      display: none;
+      border-left: 3px solid var(--red);
+    }
+
+    /* ── Summary card ── */
+    .sum-card {
+      background: var(--paper);
+      border: 1px solid var(--border);
       border-radius: var(--radius-lg);
-      padding: 1.25rem;
+      overflow: hidden;
       margin-bottom: 1rem;
     }
-    .summary-row {
+    .sum-header {
+      background: var(--red);
+      padding: 0.875rem 1.125rem;
+      display: flex;
+      align-items: center;
+    }
+    .sum-header-num {
+      font-family: 'Noto Serif JP', serif;
+      font-size: 22px;
+      font-weight: 700;
+      color: white;
+    }
+    .sum-header-label { font-size: 12px; color: rgba(255,255,255,0.75); }
+    .sum-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 7px 0;
-      border-bottom: 0.5px solid var(--border);
+      padding: 10px 1.125rem;
+      border-bottom: 1px solid var(--border);
     }
-    .summary-row:last-child { border-bottom: none; }
-    .summary-label { font-size: 14px; color: var(--text-secondary); }
-    .summary-value { font-size: 14px; font-weight: 500; color: var(--text); }
-    .summary-total { font-size: 20px; font-weight: 600; color: var(--green-dark); }
+    .sum-row:last-child { border-bottom: none; }
+    .sum-lbl { font-size: 13px; color: var(--ink3); }
+    .sum-val { font-size: 13px; font-weight: 500; color: var(--ink); }
+    .sum-total-row {
+      background: var(--gold-light);
+      padding: 10px 1.125rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .sum-total-lbl { font-size: 13px; font-weight: 600; color: var(--gold); }
+    .sum-total-val { font-size: 22px; font-weight: 700; color: var(--gold); }
 
-    /* Cupom cozinha */
-    .cupom-cozinha {
-      background: #fff;
-      border: 1px dashed #aaa;
-      border-radius: var(--radius-md);
+    /* ── Cupom cozinha ── */
+    .cupom {
+      background: white;
+      border: 1.5px dashed #bbb;
+      border-radius: var(--radius);
       padding: 1rem;
       margin-bottom: 1rem;
       font-family: 'Courier New', monospace;
       color: #222;
       text-align: center;
-      line-height: 1.5;
     }
-    .cupom-num { font-size: 13px; color: #666; margin-bottom: 4px; }
-    .cupom-cliente { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
-    .cupom-tamanho {
-      font-size: 36px;
+    .cupom-num { font-size: 11px; color: #888; margin-bottom: 4px; }
+    .cupom-nome { font-size: 15px; font-weight: 700; margin-bottom: 8px; }
+    .cupom-size {
+      font-size: 42px;
       font-weight: 900;
-      letter-spacing: 3px;
-      margin: 8px 0;
-      border-top: 1px dashed #aaa;
-      border-bottom: 1px dashed #aaa;
+      letter-spacing: 4px;
+      border-top: 1px dashed #bbb;
+      border-bottom: 1px dashed #bbb;
       padding: 8px 0;
+      margin: 6px 0;
     }
-    .cupom-detalhe { font-size: 12px; color: #444; line-height: 2; margin-top: 6px; }
+    .cupom-det { font-size: 12px; color: #555; line-height: 2; margin-top: 6px; }
 
-    /* Success */
-    .success-icon {
-      width: 64px; height: 64px;
-      background: var(--green-light);
+    /* ── Success ── */
+    .ok-screen { text-align: center; padding: 2rem 0 1rem; }
+    .ok-circle {
+      width: 72px; height: 72px;
       border-radius: 50%;
+      background: var(--red);
       display: flex; align-items: center; justify-content: center;
-      font-size: 28px;
+      font-size: 30px;
       margin: 0 auto 1rem;
+      animation: pop 0.4s cubic-bezier(.22,.68,0,1.2);
     }
-
-    /* Tags */
-    .tag {
-      display: inline-block;
-      padding: 3px 10px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 500;
-    }
-    .tag-green { background: var(--green-light); color: var(--green-dark); }
-    .tag-blue { background: var(--blue-bg); color: var(--blue-text); }
-    .tag-gray { background: var(--bg-secondary); color: var(--text-secondary); }
-
-    /* Report */
-    .report-nav { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
-    .report-tab {
-      flex: 1;
-      padding: 0.625rem;
-      text-align: center;
-      font-size: 13px;
-      font-weight: 500;
-      border: 0.5px solid var(--border);
-      border-radius: var(--radius-md);
-      cursor: pointer;
-      color: var(--text-secondary);
-      background: var(--bg);
-      transition: all 0.15s;
-    }
-    .report-tab.active { background: var(--green); color: white; border-color: var(--green); }
-    .metric-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 1rem; }
-    .metric-card { background: var(--bg-secondary); border-radius: var(--radius-md); padding: 0.875rem; }
-    .metric-label { font-size: 12px; color: var(--text-secondary); margin-bottom: 4px; }
-    .metric-value { font-size: 20px; font-weight: 600; color: var(--text); }
-    .metric-value.green { color: var(--green-dark); }
-
-    .order-item {
-      background: var(--bg);
-      border: 0.5px solid var(--border);
-      border-radius: var(--radius-md);
-      padding: 0.875rem 1rem;
-      margin-bottom: 0.5rem;
-    }
-    .order-item-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+    .ok-title {
+      font-family: 'Noto Serif JP', serif;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--red-dark);
       margin-bottom: 6px;
     }
-    .order-item-name { font-size: 14px; font-weight: 500; color: var(--text); }
-    .order-item-price { font-size: 14px; font-weight: 600; color: var(--green-dark); }
-    .order-item-tags { display: flex; gap: 4px; flex-wrap: wrap; }
+    .ok-sub { font-size: 14px; color: var(--ink3); }
 
-    /* Error */
-    .error-msg {
-      font-size: 13px;
-      color: var(--danger-text);
-      background: var(--danger-bg);
-      padding: 8px 12px;
-      border-radius: var(--radius-md);
-      margin-bottom: 0.75rem;
-      display: none;
+    /* ── Tags ── */
+    .tag { display: inline-block; padding: 3px 9px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+    .tag-red  { background: var(--red-light); color: var(--red-dark); }
+    .tag-gold { background: var(--gold-light); color: var(--gold); }
+    .tag-gray { background: var(--paper2); color: var(--ink2); }
+    .tag-ink  { background: var(--paper3); color: var(--ink2); }
+
+    /* ── Report ── */
+    .rel-nav { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
+    .rel-tab {
+      flex: 1;
+      padding: 0.75rem;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 600;
+      border: 1.5px solid var(--border2);
+      border-radius: var(--radius);
+      cursor: pointer;
+      color: var(--ink2);
+      background: var(--paper2);
+      transition: all 0.15s;
+      min-height: 48px;
     }
+    .rel-tab.active { background: var(--red); color: white; border-color: var(--red); }
 
-    /* Print styles */
+    .met-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 1rem; }
+    .met-card { background: var(--paper2); border-radius: var(--radius); padding: 0.875rem; }
+    .met-lbl { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink3); margin-bottom: 4px; }
+    .met-val { font-size: 20px; font-weight: 700; color: var(--ink); }
+    .met-val.red { color: var(--red-dark); }
+
+    .ord-item {
+      background: var(--paper);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 0.875rem 1rem;
+      margin-bottom: 0.5rem;
+      animation: slideRight 0.2s ease both;
+    }
+    .ord-hdr { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+    .ord-nm { font-size: 14px; font-weight: 600; color: var(--ink); }
+    .ord-pr { font-size: 14px; font-weight: 700; color: var(--red-dark); }
+    .ord-tags { display: flex; gap: 4px; flex-wrap: wrap; }
+
+    .divider { height: 1px; background: var(--border); margin: 1rem 0; }
+
+    /* ── Print ── */
     @media print {
-      body { background: white; padding: 0; }
-      #app { border-radius: 0; padding: 0; min-height: unset; }
-      .screen { display: none !important; }
-      #print-area { display: block !important; }
-      .cupom-cozinha {
-        border: 1px dashed #000;
+      body, html { background: white; }
+      #app { display: none; }
+      #print-area {
+        display: block !important;
+        font-family: 'Courier New', monospace;
+        text-align: center;
         width: 58mm;
         margin: 0 auto;
+        color: #000;
       }
+      #print-area .cupom-size { font-size: 36px; font-weight: 900; letter-spacing: 4px; border-top: 1px dashed #000; border-bottom: 1px dashed #000; padding: 6px 0; margin: 6px 0; }
+      #print-area .cupom-num { font-size: 11px; margin-bottom: 4px; }
+      #print-area .cupom-nome { font-size: 14px; font-weight: 700; margin-bottom: 8px; }
+      #print-area .cupom-det { font-size: 11px; line-height: 1.8; }
     }
     #print-area { display: none; }
   </style>
@@ -387,349 +462,373 @@
 <div id="app">
 
   <!-- TELA 1: Produto -->
-  <div id="screen-produto" class="screen active">
-    <div class="header">
-      <h1>🍜 Yakisoba</h1>
-      <p>Escolha o tamanho</p>
-    </div>
-    <div class="step-indicator">
-      <div class="step-dot active"></div>
-      <div class="step-dot"></div>
-      <div class="step-dot"></div>
-      <div class="step-dot"></div>
-    </div>
-    <div class="product-card" id="card-medio" onclick="selectProduct('medio')">
-      <div class="product-icon">🍜</div>
+  <div id="s1" class="screen active">
+    <div class="topbar">
       <div>
-        <div class="product-name">Yakisoba Médio</div>
-        <div class="product-price">R$ 30,00</div>
-        <div class="product-desc">Porção individual</div>
+        <div class="topbar-title">麺 Yakisoba</div>
+        <div class="topbar-sub">Novo pedido</div>
       </div>
+      <div class="topbar-badge" id="badge-num">Pedido #1</div>
     </div>
-    <div class="product-card" id="card-grande" onclick="selectProduct('grande')">
-      <div class="product-icon">🍜</div>
-      <div>
-        <div class="product-name">Yakisoba Grande</div>
-        <div class="product-price">R$ 32,00</div>
-        <div class="product-desc">Porção generosa</div>
+    <div class="progress-bar"><div class="progress-fill" style="width:25%"></div></div>
+    <div class="body">
+      <div class="section-title">Escolha o tamanho</div>
+      <div class="prod-card" id="c-medio" onclick="selProd('medio')">
+        <div class="prod-icon">🍜</div>
+        <div>
+          <div class="prod-name">Yakisoba Médio</div>
+          <div class="prod-size">Porção individual</div>
+        </div>
+        <div class="prod-price">R$30</div>
       </div>
+      <div class="prod-card" id="c-grande" onclick="selProd('grande')">
+        <div class="prod-icon">🍜</div>
+        <div>
+          <div class="prod-name">Yakisoba Grande</div>
+          <div class="prod-size">Porção generosa</div>
+        </div>
+        <div class="prod-price">R$32</div>
+      </div>
+      <div id="e1" class="err">Selecione um tamanho para continuar.</div>
+      <button class="btn-primary" onclick="step2()">Continuar →</button>
+      <button class="btn-sec" onclick="goRel()">Ver relatório de caixa</button>
     </div>
-    <div id="err-produto" class="error-msg">Selecione um tamanho para continuar.</div>
-    <button class="primary-btn" onclick="goToStep2()">Próximo →</button>
-    <button class="secondary-btn" onclick="goToRelatorio()">📊 Relatório de caixa</button>
   </div>
 
   <!-- TELA 2: Extras -->
-  <div id="screen-extras" class="screen">
-    <div class="header">
-      <h1>Adicionais</h1>
-      <p>Personalizar o pedido</p>
-    </div>
-    <div class="step-indicator">
-      <div class="step-dot done"></div>
-      <div class="step-dot active"></div>
-      <div class="step-dot"></div>
-      <div class="step-dot"></div>
-    </div>
-    <div class="section-label">Deseja molho e gergelim?</div>
-    <div class="toggle-row">
-      <span class="toggle-label">🥢 Molho</span>
-      <label class="toggle"><input type="checkbox" id="toggle-molho" checked><span class="toggle-slider"></span></label>
-    </div>
-    <div class="toggle-row" style="margin-bottom: 1.5rem;">
-      <span class="toggle-label">🌿 Gergelim</span>
-      <label class="toggle"><input type="checkbox" id="toggle-gergelim" checked><span class="toggle-slider"></span></label>
-    </div>
-    <div class="section-label">Talheres</div>
-    <div class="choice-grid">
-      <div class="choice-btn" id="btn-garfo" onclick="selectTalher('garfo')">
-        <div class="icon">🍴</div>
-        <div class="label">Garfo</div>
+  <div id="s2" class="screen">
+    <div class="topbar">
+      <div>
+        <div class="topbar-title">Adicionais</div>
+        <div class="topbar-sub">Personalizar pedido</div>
       </div>
-      <div class="choice-btn" id="btn-hashi" onclick="selectTalher('hashi')">
-        <div class="icon">🥢</div>
-        <div class="label">Hashi</div>
-      </div>
+      <div class="topbar-badge" id="badge-num2"></div>
     </div>
-    <div id="err-talher" class="error-msg">Selecione garfo ou hashi.</div>
-    <button class="primary-btn" onclick="goToStep3()">Próximo →</button>
-    <button class="secondary-btn" onclick="goToStep(1)">← Voltar</button>
+    <div class="progress-bar"><div class="progress-fill" style="width:50%"></div></div>
+    <div class="body">
+      <div class="section-title" style="margin-bottom:0.625rem;">Molho e gergelim</div>
+      <div class="toggle-card on" id="tc-molho">
+        <span class="toggle-lbl">🥢 Molho</span>
+        <label class="tog"><input type="checkbox" id="t-molho" checked onchange="toggleCard('tc-molho',this)"><span class="tog-sl"></span></label>
+      </div>
+      <div class="toggle-card on" id="tc-gerg" style="margin-bottom:1.25rem;">
+        <span class="toggle-lbl">🌿 Gergelim</span>
+        <label class="tog"><input type="checkbox" id="t-gerg" checked onchange="toggleCard('tc-gerg',this)"><span class="tog-sl"></span></label>
+      </div>
+      <div class="section-title">Talheres</div>
+      <div class="choice-grid">
+        <div class="choice-btn" id="b-garfo" onclick="selTalher('garfo')">
+          <div class="ci">🍴</div>
+          <div class="cl">Garfo</div>
+        </div>
+        <div class="choice-btn" id="b-hashi" onclick="selTalher('hashi')">
+          <div class="ci">🥢</div>
+          <div class="cl">Hashi</div>
+        </div>
+      </div>
+      <div id="e2" class="err">Selecione garfo ou hashi.</div>
+      <button class="btn-primary" onclick="step3()">Continuar →</button>
+      <button class="btn-sec" onclick="goS(1)">← Voltar</button>
+    </div>
   </div>
 
   <!-- TELA 3: Cliente -->
-  <div id="screen-cliente" class="screen">
-    <div class="header">
-      <h1>Dados do cliente</h1>
-      <p>Nome e pagamento</p>
+  <div id="s3" class="screen">
+    <div class="topbar">
+      <div>
+        <div class="topbar-title">Cliente</div>
+        <div class="topbar-sub">Nome e pagamento</div>
+      </div>
+      <div class="topbar-badge" id="badge-num3"></div>
     </div>
-    <div class="step-indicator">
-      <div class="step-dot done"></div>
-      <div class="step-dot done"></div>
-      <div class="step-dot active"></div>
-      <div class="step-dot"></div>
+    <div class="progress-bar"><div class="progress-fill" style="width:75%"></div></div>
+    <div class="body">
+      <div class="section-title" style="margin-bottom:0.5rem;">Nome do cliente</div>
+      <input type="text" id="inp-nome" class="nm-input" placeholder="Digite o nome..." autocomplete="off"/>
+      <div class="section-title">Pagamento</div>
+      <div class="pay-grid">
+        <div class="pay-btn" id="p-din" onclick="selPag('dinheiro')">
+          <div class="pi">💵</div><div class="pl">Dinheiro</div>
+        </div>
+        <div class="pay-btn" id="p-pix" onclick="selPag('pix')">
+          <div class="pi">📱</div><div class="pl">Pix</div>
+        </div>
+        <div class="pay-btn" id="p-cre" onclick="selPag('credito')">
+          <div class="pi">💳</div><div class="pl">Crédito</div>
+        </div>
+        <div class="pay-btn" id="p-deb" onclick="selPag('debito')">
+          <div class="pi">💳</div><div class="pl">Débito</div>
+        </div>
+      </div>
+      <div id="e3" class="err">Preencha o nome e selecione o pagamento.</div>
+      <button class="btn-primary" onclick="stepResumo()">Revisar pedido →</button>
+      <button class="btn-sec" onclick="goS(2)">← Voltar</button>
     </div>
-    <div class="section-label" style="margin-bottom: 0.5rem;">Nome do cliente</div>
-    <input type="text" id="input-nome" class="name-input" placeholder="Digite o nome..." autocomplete="off" />
-    <div class="section-label">Forma de pagamento</div>
-    <div class="payment-grid">
-      <div class="payment-btn" id="pay-dinheiro" onclick="selectPagamento('dinheiro')">
-        <div class="icon">💵</div>
-        <div class="label">Dinheiro</div>
-      </div>
-      <div class="payment-btn" id="pay-pix" onclick="selectPagamento('pix')">
-        <div class="icon">📱</div>
-        <div class="label">Pix</div>
-      </div>
-      <div class="payment-btn" id="pay-credito" onclick="selectPagamento('credito')">
-        <div class="icon">💳</div>
-        <div class="label">Crédito</div>
-      </div>
-      <div class="payment-btn" id="pay-debito" onclick="selectPagamento('debito')">
-        <div class="icon">💳</div>
-        <div class="label">Débito</div>
-      </div>
-    </div>
-    <div id="err-cliente" class="error-msg">Preencha o nome e escolha o pagamento.</div>
-    <button class="primary-btn" onclick="goToResumo()">Revisar pedido →</button>
-    <button class="secondary-btn" onclick="goToStep(2)">← Voltar</button>
   </div>
 
   <!-- TELA 4: Resumo -->
-  <div id="screen-resumo" class="screen">
-    <div class="header">
-      <h1>Resumo do pedido</h1>
-      <p>Confirme antes de finalizar</p>
+  <div id="s4" class="screen">
+    <div class="topbar">
+      <div>
+        <div class="topbar-title">Confirmar</div>
+        <div class="topbar-sub">Revise antes de finalizar</div>
+      </div>
+      <div class="topbar-badge" id="badge-num4"></div>
     </div>
-    <div class="step-indicator">
-      <div class="step-dot done"></div>
-      <div class="step-dot done"></div>
-      <div class="step-dot done"></div>
-      <div class="step-dot active"></div>
+    <div class="progress-bar"><div class="progress-fill" style="width:90%"></div></div>
+    <div class="body">
+      <div id="sum-card" class="sum-card"></div>
+      <div class="section-title" style="margin-bottom:0.5rem;">Cupom da cozinha</div>
+      <div id="cupom-prev"></div>
+      <button class="btn-primary" onclick="finalizar()">✓ Finalizar e imprimir</button>
+      <button class="btn-sec" onclick="goS(3)">← Voltar</button>
     </div>
-    <div class="summary-card" id="resumo-card"></div>
-    <div class="section-label" style="margin-bottom: 0.5rem;">Prévia do cupom da cozinha</div>
-    <div id="print-preview"></div>
-    <button class="primary-btn" onclick="finalizarPedido()">✅ Finalizar e imprimir</button>
-    <button class="secondary-btn" onclick="goToStep(3)">← Voltar</button>
   </div>
 
   <!-- TELA 5: Sucesso -->
-  <div id="screen-sucesso" class="screen">
-    <div style="text-align: center; padding: 1.5rem 0;">
-      <div class="success-icon">✅</div>
-      <h2 style="font-size: 18px; font-weight: 600; margin-bottom: 8px;">Pedido enviado!</h2>
-      <p style="font-size: 14px; color: var(--text-secondary);" id="sucesso-msg"></p>
+  <div id="s5" class="screen">
+    <div class="progress-bar"><div class="progress-fill" style="width:100%"></div></div>
+    <div class="body">
+      <div class="ok-screen">
+        <div class="ok-circle">✓</div>
+        <div class="ok-title">Pedido enviado!</div>
+        <div class="ok-sub" id="ok-sub"></div>
+      </div>
+      <div id="ok-cupom"></div>
+      <button class="btn-primary" onclick="novoPedido()">+ Novo pedido</button>
+      <button class="btn-sec" onclick="goRel()">Ver relatório de caixa</button>
     </div>
-    <div id="sucesso-card"></div>
-    <button class="primary-btn" onclick="novoPedido()">+ Novo pedido</button>
-    <button class="secondary-btn" onclick="goToRelatorio()">📊 Ver relatório</button>
   </div>
 
   <!-- TELA 6: Relatório -->
-  <div id="screen-relatorio" class="screen">
-    <div class="header">
-      <h1>Relatório de caixa</h1>
-      <p id="relatorio-data"></p>
-    </div>
-    <div class="report-nav">
-      <div class="report-tab active" id="tab-resumo" onclick="showTab('resumo')">Resumo</div>
-      <div class="report-tab" id="tab-pedidos" onclick="showTab('pedidos')">Pedidos</div>
-    </div>
-    <div id="tab-content-resumo">
-      <div class="metric-grid">
-        <div class="metric-card"><div class="metric-label">Total geral</div><div class="metric-value green" id="rel-total"></div></div>
-        <div class="metric-card"><div class="metric-label">Pedidos</div><div class="metric-value" id="rel-qtd"></div></div>
-        <div class="metric-card"><div class="metric-label">Dinheiro</div><div class="metric-value" id="rel-dinheiro"></div></div>
-        <div class="metric-card"><div class="metric-label">Pix</div><div class="metric-value" id="rel-pix"></div></div>
-        <div class="metric-card"><div class="metric-label">Crédito</div><div class="metric-value" id="rel-credito"></div></div>
-        <div class="metric-card"><div class="metric-label">Débito</div><div class="metric-value" id="rel-debito"></div></div>
+  <div id="s6" class="screen">
+    <div class="topbar">
+      <div>
+        <div class="topbar-title">Caixa</div>
+        <div class="topbar-sub" id="rel-data"></div>
       </div>
-      <div class="section-label" style="margin-bottom: 0.5rem;">Produtos vendidos</div>
-      <div class="metric-grid">
-        <div class="metric-card"><div class="metric-label">Médio</div><div class="metric-value" id="rel-medio"></div></div>
-        <div class="metric-card"><div class="metric-label">Grande</div><div class="metric-value" id="rel-grande"></div></div>
-      </div>
+      <button class="btn-sec" style="width:auto;padding:6px 16px;margin-top:0;font-size:13px;min-height:38px;" onclick="goS(1)">← Voltar</button>
     </div>
-    <div id="tab-content-pedidos" style="display:none;"></div>
-    <button class="secondary-btn" onclick="goToStep(1)">← Voltar ao caixa</button>
+    <div class="progress-bar"><div class="progress-fill" style="width:0%"></div></div>
+    <div class="body">
+      <div class="rel-nav">
+        <div class="rel-tab active" id="rt-res" onclick="showTab('res')">Resumo</div>
+        <div class="rel-tab" id="rt-ped" onclick="showTab('ped')">Pedidos</div>
+      </div>
+      <div id="tab-res">
+        <div class="met-grid">
+          <div class="met-card"><div class="met-lbl">Total do dia</div><div class="met-val red" id="r-total"></div></div>
+          <div class="met-card"><div class="met-lbl">Pedidos</div><div class="met-val" id="r-qtd"></div></div>
+          <div class="met-card"><div class="met-lbl">Dinheiro</div><div class="met-val" id="r-din"></div></div>
+          <div class="met-card"><div class="met-lbl">Pix</div><div class="met-val" id="r-pix"></div></div>
+          <div class="met-card"><div class="met-lbl">Crédito</div><div class="met-val" id="r-cre"></div></div>
+          <div class="met-card"><div class="met-lbl">Débito</div><div class="met-val" id="r-deb"></div></div>
+        </div>
+        <div class="divider"></div>
+        <div class="section-title" style="margin-bottom:0.5rem;">Produtos vendidos</div>
+        <div class="met-grid">
+          <div class="met-card"><div class="met-lbl">Médio</div><div class="met-val" id="r-med"></div></div>
+          <div class="met-card"><div class="met-lbl">Grande</div><div class="met-val" id="r-gra"></div></div>
+        </div>
+      </div>
+      <div id="tab-ped" style="display:none;"></div>
+    </div>
   </div>
 
 </div>
 
-<!-- Área oculta para impressão -->
+<!-- Área de impressão (oculta na tela, visível no print) -->
 <div id="print-area"></div>
 
 <script>
-  let pedido = {};
-  let pedidos = JSON.parse(localStorage.getItem('yaki_pedidos') || '[]');
+  let p = {};
+  let pedidos = JSON.parse(localStorage.getItem('yaki_pdv') || '[]');
 
-  function proximoNumero() {
-    return pedidos.length + 1;
-  }
+  function nextNum() { return pedidos.length + 1; }
 
-  function selectProduct(tipo) {
-    pedido.produto = tipo;
-    pedido.preco = tipo === 'medio' ? 30 : 32;
-    document.querySelectorAll('.product-card').forEach(c => c.classList.remove('selected'));
-    document.getElementById('card-' + tipo).classList.add('selected');
-    document.getElementById('err-produto').style.display = 'none';
-  }
-
-  function selectTalher(tipo) {
-    pedido.talher = tipo;
-    document.querySelectorAll('.choice-btn').forEach(c => c.classList.remove('selected'));
-    document.getElementById('btn-' + tipo).classList.add('selected');
-    document.getElementById('err-talher').style.display = 'none';
-  }
-
-  function selectPagamento(tipo) {
-    pedido.pagamento = tipo;
-    document.querySelectorAll('.payment-btn').forEach(c => c.classList.remove('selected'));
-    document.getElementById('pay-' + tipo).classList.add('selected');
-    document.getElementById('err-cliente').style.display = 'none';
-  }
-
-  function goToStep(n) {
-    const screens = ['produto', 'extras', 'cliente', 'resumo', 'sucesso', 'relatorio'];
+  function goS(n) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    document.getElementById('screen-' + screens[n - 1]).classList.add('active');
+    document.getElementById('s' + n).classList.add('active');
     window.scrollTo(0, 0);
   }
 
-  function goToStep2() {
-    if (!pedido.produto) { document.getElementById('err-produto').style.display = 'block'; return; }
-    goToStep(2);
+  function selProd(t) {
+    p.produto = t;
+    p.preco = t === 'medio' ? 30 : 32;
+    document.querySelectorAll('.prod-card').forEach(c => c.classList.remove('selected'));
+    document.getElementById('c-' + t).classList.add('selected');
+    document.getElementById('e1').style.display = 'none';
   }
 
-  function goToStep3() {
-    if (!pedido.talher) { document.getElementById('err-talher').style.display = 'block'; return; }
-    pedido.molho = document.getElementById('toggle-molho').checked;
-    pedido.gergelim = document.getElementById('toggle-gergelim').checked;
-    goToStep(3);
+  function selTalher(t) {
+    p.talher = t;
+    document.querySelectorAll('.choice-btn').forEach(c => c.classList.remove('selected'));
+    document.getElementById('b-' + t).classList.add('selected');
+    document.getElementById('e2').style.display = 'none';
   }
 
-  function goToResumo() {
-    const nome = document.getElementById('input-nome').value.trim();
-    if (!nome || !pedido.pagamento) { document.getElementById('err-cliente').style.display = 'block'; return; }
-    pedido.nome = nome;
+  function selPag(t) {
+    p.pag = t;
+    document.querySelectorAll('.pay-btn').forEach(c => c.classList.remove('selected'));
+    const map = { dinheiro: 'din', pix: 'pix', credito: 'cre', debito: 'deb' };
+    document.getElementById('p-' + map[t]).classList.add('selected');
+    document.getElementById('e3').style.display = 'none';
+  }
+
+  function toggleCard(id, el) {
+    document.getElementById(id).classList.toggle('on', el.checked);
+  }
+
+  function step2() {
+    if (!p.produto) { document.getElementById('e1').style.display = 'block'; return; }
+    const n = nextNum();
+    ['badge-num2', 'badge-num3', 'badge-num4'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = 'Pedido #' + n;
+    });
+    goS(2);
+  }
+
+  function step3() {
+    if (!p.talher) { document.getElementById('e2').style.display = 'block'; return; }
+    p.molho = document.getElementById('t-molho').checked;
+    p.gerg  = document.getElementById('t-gerg').checked;
+    goS(3);
+  }
+
+  function stepResumo() {
+    const nome = document.getElementById('inp-nome').value.trim();
+    if (!nome || !p.pag) { document.getElementById('e3').style.display = 'block'; return; }
+    p.nome = nome;
     renderResumo();
-    goToStep(4);
+    goS(4);
   }
 
-  function buildCupomHTML(num, p) {
-    const tamanhoLabel = p.produto === 'medio' ? 'MÉDIO' : 'GRANDE';
+  function cupomHTML(num, x) {
+    const tl = x.produto === 'medio' ? 'MÉDIO' : 'GRANDE';
     return `
-      <div class="cupom-cozinha">
-        <div class="cupom-num">Pedido #${num} &nbsp;|&nbsp; ${p.hora || ''}</div>
-        <div class="cupom-cliente">${p.nome}</div>
-        <div class="cupom-tamanho">${tamanhoLabel}</div>
-        <div class="cupom-detalhe">
-          Molho: ${p.molho ? 'SIM' : 'NÃO'} &nbsp;|&nbsp; Gergelim: ${p.gergelim ? 'SIM' : 'NÃO'}<br>
-          Talheres: ${p.talher === 'garfo' ? 'GARFO' : 'HASHI'}
+      <div class="cupom">
+        <div class="cupom-num">Pedido #${num} · ${x.hora || ''}</div>
+        <div class="cupom-nome">${x.nome}</div>
+        <div class="cupom-size">${tl}</div>
+        <div class="cupom-det">
+          Molho: ${x.molho ? 'SIM' : 'NÃO'} &nbsp;|&nbsp; Gergelim: ${x.gerg ? 'SIM' : 'NÃO'}<br>
+          Talheres: ${x.talher === 'garfo' ? 'GARFO' : 'HASHI'}
         </div>
-      </div>
-    `;
+      </div>`;
   }
 
   function renderResumo() {
-    const tamanhoLabel = pedido.produto === 'medio' ? 'Médio' : 'Grande';
-    const pgLabel = { dinheiro: 'Dinheiro', pix: 'Pix', credito: 'Crédito', debito: 'Débito' }[pedido.pagamento];
-    const num = proximoNumero();
-    document.getElementById('resumo-card').innerHTML = `
-      <div class="summary-row"><span class="summary-label">Nº pedido</span><span class="summary-value">#${num}</span></div>
-      <div class="summary-row"><span class="summary-label">Cliente</span><span class="summary-value">${pedido.nome}</span></div>
-      <div class="summary-row"><span class="summary-label">Tamanho</span><span class="summary-value">Yakisoba ${tamanhoLabel}</span></div>
-      <div class="summary-row"><span class="summary-label">Molho</span><span class="summary-value">${pedido.molho ? '✓ Sim' : '✗ Não'}</span></div>
-      <div class="summary-row"><span class="summary-label">Gergelim</span><span class="summary-value">${pedido.gergelim ? '✓ Sim' : '✗ Não'}</span></div>
-      <div class="summary-row"><span class="summary-label">Talheres</span><span class="summary-value">${pedido.talher === 'garfo' ? '🍴 Garfo' : '🥢 Hashi'}</span></div>
-      <div class="summary-row"><span class="summary-label">Pagamento</span><span class="summary-value">${pgLabel}</span></div>
-      <div class="summary-row"><span class="summary-label" style="font-weight:600;">Total</span><span class="summary-total">R$ ${pedido.preco.toFixed(2).replace('.', ',')}</span></div>
-    `;
-    const previewPedido = { ...pedido, hora: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) };
-    document.getElementById('print-preview').innerHTML = buildCupomHTML(num, previewPedido);
+    const tl  = p.produto === 'medio' ? 'Médio' : 'Grande';
+    const pl  = { dinheiro: 'Dinheiro', pix: 'Pix', credito: 'Crédito', debito: 'Débito' }[p.pag];
+    const num = nextNum();
+    const fmt = v => 'R$ ' + v.toFixed(2).replace('.', ',');
+    document.getElementById('sum-card').innerHTML = `
+      <div class="sum-header">
+        <div>
+          <div class="sum-header-label">Pedido</div>
+          <div class="sum-header-num">#${num}</div>
+        </div>
+        <div style="margin-left:auto;text-align:right;">
+          <div class="sum-header-label">Cliente</div>
+          <div style="font-size:15px;font-weight:600;color:white;">${p.nome}</div>
+        </div>
+      </div>
+      <div class="sum-row"><span class="sum-lbl">Tamanho</span><span class="sum-val">Yakisoba ${tl}</span></div>
+      <div class="sum-row"><span class="sum-lbl">Molho</span><span class="sum-val">${p.molho ? '✓ Sim' : '✗ Não'}</span></div>
+      <div class="sum-row"><span class="sum-lbl">Gergelim</span><span class="sum-val">${p.gerg ? '✓ Sim' : '✗ Não'}</span></div>
+      <div class="sum-row"><span class="sum-lbl">Talheres</span><span class="sum-val">${p.talher === 'garfo' ? '🍴 Garfo' : '🥢 Hashi'}</span></div>
+      <div class="sum-row"><span class="sum-lbl">Pagamento</span><span class="sum-val">${pl}</span></div>
+      <div class="sum-total-row">
+        <span class="sum-total-lbl">Total</span>
+        <span class="sum-total-val">${fmt(p.preco)}</span>
+      </div>`;
+    const prev = { ...p, hora: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) };
+    document.getElementById('cupom-prev').innerHTML = cupomHTML(num, prev);
   }
 
-  function finalizarPedido() {
-    pedido.hora = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-    pedido.data = new Date().toLocaleDateString('pt-BR');
-    const num = proximoNumero();
-    pedido.numero = num;
-    pedidos.push({ ...pedido });
-    localStorage.setItem('yaki_pedidos', JSON.stringify(pedidos));
+  function finalizar() {
+    p.hora   = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+    p.data   = new Date().toLocaleDateString('pt-BR');
+    const num = nextNum();
+    p.numero  = num;
+    pedidos.push({ ...p });
+    localStorage.setItem('yaki_pdv', JSON.stringify(pedidos));
 
-    // Impressão via window.print()
-    const printArea = document.getElementById('print-area');
-    printArea.innerHTML = buildCupomHTML(num, pedido);
+    document.getElementById('print-area').innerHTML = cupomHTML(num, p);
     window.print();
 
-    document.getElementById('sucesso-msg').textContent = '#' + num + ' — ' + pedido.nome + ' — R$ ' + pedido.preco.toFixed(2).replace('.', ',');
-    document.getElementById('sucesso-card').innerHTML = buildCupomHTML(num, pedido);
-    goToStep(5);
+    const fmt = v => 'R$ ' + v.toFixed(2).replace('.', ',');
+    document.getElementById('ok-sub').textContent = '#' + num + ' — ' + p.nome + ' — ' + fmt(p.preco);
+    document.getElementById('ok-cupom').innerHTML = cupomHTML(num, p);
+    goS(5);
   }
 
   function novoPedido() {
-    pedido = {};
-    document.querySelectorAll('.product-card').forEach(c => c.classList.remove('selected'));
-    document.querySelectorAll('.choice-btn').forEach(c => c.classList.remove('selected'));
-    document.querySelectorAll('.payment-btn').forEach(c => c.classList.remove('selected'));
-    document.getElementById('input-nome').value = '';
-    document.getElementById('toggle-molho').checked = true;
-    document.getElementById('toggle-gergelim').checked = true;
-    goToStep(1);
+    p = {};
+    document.querySelectorAll('.prod-card, .choice-btn, .pay-btn').forEach(el => el.classList.remove('selected'));
+    document.getElementById('inp-nome').value = '';
+    document.getElementById('t-molho').checked = true;
+    document.getElementById('t-gerg').checked  = true;
+    document.getElementById('tc-molho').classList.add('on');
+    document.getElementById('tc-gerg').classList.add('on');
+    document.getElementById('badge-num').textContent = 'Pedido #' + nextNum();
+    goS(1);
   }
 
-  function goToRelatorio() {
+  function goRel() {
     const hoje = new Date().toLocaleDateString('pt-BR');
-    document.getElementById('relatorio-data').textContent = 'Data: ' + hoje;
-    const totais = { dinheiro: 0, pix: 0, credito: 0, debito: 0 };
-    let totalGeral = 0, qtdMedio = 0, qtdGrande = 0;
-    pedidos.forEach(p => {
-      totalGeral += p.preco;
-      totais[p.pagamento] = (totais[p.pagamento] || 0) + p.preco;
-      if (p.produto === 'medio') qtdMedio++; else qtdGrande++;
+    document.getElementById('rel-data').textContent = 'Data: ' + hoje;
+    const tot = { dinheiro: 0, pix: 0, credito: 0, debito: 0 };
+    let total = 0, med = 0, gra = 0;
+    pedidos.forEach(x => {
+      total += x.preco;
+      tot[x.pag] = (tot[x.pag] || 0) + x.preco;
+      x.produto === 'medio' ? med++ : gra++;
     });
     const fmt = v => 'R$ ' + v.toFixed(2).replace('.', ',');
-    document.getElementById('rel-total').textContent = fmt(totalGeral);
-    document.getElementById('rel-qtd').textContent = pedidos.length;
-    document.getElementById('rel-dinheiro').textContent = fmt(totais.dinheiro || 0);
-    document.getElementById('rel-pix').textContent = fmt(totais.pix || 0);
-    document.getElementById('rel-credito').textContent = fmt(totais.credito || 0);
-    document.getElementById('rel-debito').textContent = fmt(totais.debito || 0);
-    document.getElementById('rel-medio').textContent = qtdMedio + ' un.';
-    document.getElementById('rel-grande').textContent = qtdGrande + ' un.';
-    renderPedidosList();
-    goToStep(6);
+    document.getElementById('r-total').textContent = fmt(total);
+    document.getElementById('r-qtd').textContent   = pedidos.length;
+    document.getElementById('r-din').textContent   = fmt(tot.dinheiro || 0);
+    document.getElementById('r-pix').textContent   = fmt(tot.pix      || 0);
+    document.getElementById('r-cre').textContent   = fmt(tot.credito  || 0);
+    document.getElementById('r-deb').textContent   = fmt(tot.debito   || 0);
+    document.getElementById('r-med').textContent   = med + ' un.';
+    document.getElementById('r-gra').textContent   = gra + ' un.';
+    renderOrders();
+    goS(6);
   }
 
-  function renderPedidosList() {
-    const container = document.getElementById('tab-content-pedidos');
-    if (pedidos.length === 0) {
-      container.innerHTML = '<p style="font-size:14px;color:var(--text-secondary);text-align:center;padding:1rem;">Nenhum pedido ainda.</p>';
+  function renderOrders() {
+    const c = document.getElementById('tab-ped');
+    if (!pedidos.length) {
+      c.innerHTML = '<p style="font-size:14px;color:var(--ink3);text-align:center;padding:1.5rem;">Nenhum pedido ainda.</p>';
       return;
     }
-    const pgLabels = { dinheiro: 'Dinheiro', pix: 'Pix', credito: 'Crédito', debito: 'Débito' };
-    container.innerHTML = [...pedidos].reverse().map(p => `
-      <div class="order-item">
-        <div class="order-item-header">
-          <span class="order-item-name">#${p.numero} ${p.nome} <span style="font-weight:400;font-size:12px;color:var(--text-secondary)">${p.hora || ''}</span></span>
-          <span class="order-item-price">R$ ${p.preco.toFixed(2).replace('.', ',')}</span>
+    const pl = { dinheiro: 'Dinheiro', pix: 'Pix', credito: 'Crédito', debito: 'Débito' };
+    c.innerHTML = [...pedidos].reverse().map((x, i) => `
+      <div class="ord-item" style="animation-delay:${i * 0.04}s">
+        <div class="ord-hdr">
+          <span class="ord-nm">#${x.numero} ${x.nome}
+            <span style="font-weight:400;font-size:11px;color:var(--ink3)">${x.hora || ''}</span>
+          </span>
+          <span class="ord-pr">R$ ${x.preco.toFixed(2).replace('.', ',')}</span>
         </div>
-        <div class="order-item-tags">
-          <span class="tag tag-green">${p.produto === 'medio' ? 'Médio' : 'Grande'}</span>
-          ${p.molho ? '<span class="tag tag-gray">Molho</span>' : ''}
-          ${p.gergelim ? '<span class="tag tag-gray">Gergelim</span>' : ''}
-          <span class="tag tag-gray">${p.talher === 'garfo' ? 'Garfo' : 'Hashi'}</span>
-          <span class="tag tag-blue">${pgLabels[p.pagamento]}</span>
+        <div class="ord-tags">
+          <span class="tag tag-red">${x.produto === 'medio' ? 'Médio' : 'Grande'}</span>
+          ${x.molho ? '<span class="tag tag-gold">Molho</span>'   : ''}
+          ${x.gerg  ? '<span class="tag tag-gold">Gergelim</span>' : ''}
+          <span class="tag tag-gray">${x.talher === 'garfo' ? 'Garfo' : 'Hashi'}</span>
+          <span class="tag tag-ink">${pl[x.pag]}</span>
         </div>
-      </div>
-    `).join('');
+      </div>`).join('');
   }
 
-  function showTab(tab) {
-    document.getElementById('tab-content-resumo').style.display = tab === 'resumo' ? 'block' : 'none';
-    document.getElementById('tab-content-pedidos').style.display = tab === 'pedidos' ? 'block' : 'none';
-    document.querySelectorAll('.report-tab').forEach(t => t.classList.remove('active'));
-    document.getElementById('tab-' + tab).classList.add('active');
+  function showTab(t) {
+    document.getElementById('tab-res').style.display = t === 'res' ? 'block' : 'none';
+    document.getElementById('tab-ped').style.display = t === 'ped' ? 'block' : 'none';
+    document.getElementById('rt-res').classList.toggle('active', t === 'res');
+    document.getElementById('rt-ped').classList.toggle('active', t === 'ped');
   }
 </script>
 </body>
