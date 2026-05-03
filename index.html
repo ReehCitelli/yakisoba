@@ -817,7 +817,7 @@
           <span class="tag tag-red">${x.produto === 'medio' ? 'Médio' : 'Grande'}</span>
           ${x.molho ? '<span class="tag tag-gold">Molho</span>'   : ''}
           ${x.gerg  ? '<span class="tag tag-gold">Gergelim</span>' : ''}
-          <span class="tag tag-gray">${x.talher === 'garfo' ? 'Garfo' : 'Hashi'}</span>
+          ${x.talher ? `<span class="tag tag-gray">${x.talher === 'garfo' ? 'Garfo' : 'Hashi'}</span>` : ''}
           <span class="tag tag-ink">${pl[x.pag]}</span>
         </div>
       </div>`).join('');
