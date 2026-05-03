@@ -1,31 +1,39 @@
 # 🍜 Yakisoba PDV
 
-Sistema de ponto de venda (PDV) para restaurante de yakisoba. Desenvolvido com HTML, CSS e JavaScript puro — sem dependências externas.
+Sistema de ponto de venda para restaurante de yakisoba. Arquivo único em HTML, CSS e JavaScript puro — sem dependências, sem servidor, sem instalação.
 
 ## ✨ Funcionalidades
 
-- **Registro de pedidos** em 4 etapas simples
-- **Personalização** de molho, gergelim e talheres (garfo ou hashi)
-- **Formas de pagamento**: dinheiro, Pix, crédito e débito
-- **Numeração automática** dos pedidos
-- **Cupom da cozinha** com tamanho em destaque para fácil identificação
-- **Impressão** via `window.print()` ao finalizar pedido
-- **Relatório de caixa** com totais por forma de pagamento e produtos vendidos
-- **Modo escuro** automático (respeita preferência do sistema)
-- **Dados salvos localmente** no navegador (localStorage)
+- Registro de pedidos em 4 etapas com barra de progresso
+- Seleção de tamanho: Médio (R$30) ou Grande (R$32)
+- Personalização de molho, gergelim e talheres (garfo ou hashi)
+- Formas de pagamento: Dinheiro, Pix, Crédito e Débito
+- Nome do cliente vinculado ao pedido
+- Numeração automática sequencial dos pedidos
+- Cupom da cozinha com tamanho em destaque (fonte grande)
+- Impressão via `window.print()` ao finalizar
+- Relatório de caixa com totais por forma de pagamento
+- Lista de todos os pedidos do dia com detalhes
+- Dados salvos no navegador (localStorage) — persistem mesmo fechando a aba
+- Design responsivo otimizado para uso em tablet/celular
+- Identidade visual japonesa: tons creme, vermelho escuro e dourado
 
 ## 🚀 Como usar
 
-Basta abrir o arquivo `index.html` no navegador. Não precisa de servidor, instalação ou internet.
+Abra o `index.html` diretamente no navegador. Sem servidor, sem internet.
 
-Para usar no tablet/celular do balcão:
-1. Coloque o arquivo em qualquer servidor web (GitHub Pages, por exemplo)
-2. Acesse a URL pelo navegador do dispositivo
-3. Salve como atalho na tela inicial para parecer um app
+### No GitHub Pages (recomendado para tablet no balcão)
+1. Crie um repositório no GitHub
+2. Faça upload do `index.html`
+3. Ative o GitHub Pages em **Settings → Pages**
+4. Acesse a URL pelo tablet e salve como atalho na tela inicial
 
-## 🖨️ Impressão
+## 🖨️ Impressão térmica
 
-Ao clicar em "Finalizar e imprimir", o sistema chama `window.print()` automaticamente. Para conectar a uma impressora térmica real, recomenda-se o uso do **QZ Tray** (qz.io) como intermediário entre o navegador e a impressora.
+Ao finalizar o pedido, o sistema chama `window.print()` automaticamente.
+O CSS de impressão já está configurado para largura de 58mm (cupom padrão).
+
+Para integração direta com impressora térmica via USB/rede, recomenda-se o **QZ Tray** (qz.io).
 
 ## 🗂️ Estrutura
 
@@ -36,11 +44,11 @@ yakisoba-pdv/
 
 ## 🛠️ Tecnologias
 
-- HTML5
-- CSS3 (variáveis CSS, dark mode, responsivo)
-- JavaScript vanilla
-- localStorage para persistência dos dados
+- HTML5 / CSS3 / JavaScript vanilla
+- Google Fonts: Noto Serif JP + DM Sans
+- localStorage para persistência dos pedidos
+- `window.print()` para impressão do cupom
 
 ---
 
-Desenvolvido como sistema de PDV simples para pequeno restaurante.
+Desenvolvido como PDV simples para pequeno restaurante de yakisoba.
