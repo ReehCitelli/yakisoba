@@ -712,7 +712,7 @@
         <div class="cupom-size">${tl}</div>
         <div class="cupom-det">
           Molho: ${x.molho ? 'SIM' : 'NÃO'} &nbsp;|&nbsp; Gergelim: ${x.gerg ? 'SIM' : 'NÃO'}<br>
-          Talheres: ${x.talher === 'garfo' ? 'GARFO' : 'HASHI'}
+          Talheres: ${x.talher === 'garfo' ? 'GARFO' : x.talher === 'hashi' ? 'HASHI' : 'NENHUM'}
         </div>
       </div>`;
   }
@@ -736,7 +736,7 @@
       <div class="sum-row"><span class="sum-lbl">Tamanho</span><span class="sum-val">Yakisoba ${tl}</span></div>
       <div class="sum-row"><span class="sum-lbl">Molho</span><span class="sum-val">${p.molho ? '✓ Sim' : '✗ Não'}</span></div>
       <div class="sum-row"><span class="sum-lbl">Gergelim</span><span class="sum-val">${p.gerg ? '✓ Sim' : '✗ Não'}</span></div>
-      <div class="sum-row"><span class="sum-lbl">Talheres</span><span class="sum-val">${p.talher === 'garfo' ? '🍴 Garfo' : '🥢 Hashi'}</span></div>
+      <div class="sum-row"><span class="sum-lbl">Talheres</span><span class="sum-val">${p.talher === 'garfo' ? '🍴 Garfo' : p.talher === 'hashi' ? '🥢 Hashi' : '— Nenhum'}</span></div>
       <div class="sum-row"><span class="sum-lbl">Pagamento</span><span class="sum-val">${pl}</span></div>
       <div class="sum-total-row">
         <span class="sum-total-lbl">Total</span>
